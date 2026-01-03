@@ -24,7 +24,8 @@ def main():
             if found:
                 continue 
             else:
-                command = command_content       
+                print(f'{command_content}: not found')     
+                break
 
         print(f"{command}: command not found")
 
