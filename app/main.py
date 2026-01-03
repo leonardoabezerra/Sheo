@@ -9,8 +9,8 @@ def main():
         command = input()
         if command == 'exit':
             break
-        elif command[:4] == 'echo':
-            print(f"{command[4:]}")
+        elif command[:5] == 'echo ':
+            print(f"{command[5:]}")
             continue
 
 
