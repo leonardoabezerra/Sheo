@@ -9,6 +9,10 @@ def main():
         command = input()
         if command == 'exit':
             break
+        elif command[:4] == 'echo':
+            print(f"{command[4:]}")
+            continue
+
 
         print(f"{command}: command not found")
 
