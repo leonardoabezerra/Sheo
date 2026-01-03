@@ -25,7 +25,7 @@ def main():
                 continue 
             else:
                 print(f'{command_content}: not found')     
-                break
+                continue
 
         print(f"{command}: command not found")
 
