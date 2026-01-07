@@ -1,4 +1,4 @@
-import sys, os, subprocess
+import sys, os, subprocess, shlex
 
 def main():
     PATH = os.environ['PATH']
@@ -9,19 +9,14 @@ def main():
         sys.stdout.write("$ ")
 
         # Handle command input
-        command = input()
-        command, _, command_content = command.partition(" ")
-        split_command_content = command_content.split(" ")
+        input_line = input()
+        command, _, command_content = input_line.partition(" ")
 
-        # Strip quotes from arguments
-        stripped_args = []
-        for arg in split_command_content:
-            if (arg.startswith('"') and arg.endswith('"')) or \
-               (arg.startswith("'") and arg.endswith("'")):
-                stripped_args.append(arg[1:-1])
-            else:
-                stripped_args.append(arg)
-        split_command_content = stripped_args
+        # Strip quotes from arguments and handle empty commands
+        split_command_content = shlex.split(command_content) 
+        if not split_command_content: # Reset loop if command is empty "[]"
+            continue
+        
         command_content = " ".join(split_command_content)
 
         # Handle output redirection
