@@ -10,53 +10,55 @@ def main():
 
         # Handle command input
         input_line = input()
-        command, _, command_content = input_line.partition(" ")
+        full_command = shlex.split(input_line)
 
-        # Strip quotes from arguments and handle empty commands
-        split_command_content = shlex.split(command_content) 
-        if not split_command_content: # Reset loop if command is empty "[]"
+        if not full_command: 
             continue
-        
-        command_content = " ".join(split_command_content)
+
+        command = full_command[0]
+        args = full_command[1:]
+
+        args_str = " ".join(args)
 
         # Handle output redirection
         redirect_filename = None
-        if '>' in split_command_content or '1>' in split_command_content:
-            if '>' in split_command_content:
-                redirect_index = split_command_content.index('>')
+        if '>' in args or '1>' in args:
+            if '>' in args:
+                redirect_index = args.index('>')
             else:
-                redirect_index = split_command_content.index('1>')
+                redirect_index = args.index('1>')
 
-            if redirect_index + 1 < len(split_command_content):
-                redirect_filename = split_command_content[redirect_index + 1]
+            if redirect_index + 1 < len(args):
+                redirect_filename = args[redirect_index + 1]
                 sys.stdout = open(redirect_filename, 'w')
 
-                command_content = " ".join(split_command_content[:redirect_index])
+                args = args[:redirect_index]
+                args_str = " ".join(args)
 
 
         # Execute built-in commands or external programs
         if command == 'exit':
             break
         elif command == 'echo':
-            print(f"{command_content}")
+            print(f"{args_str}")
 
         elif command == 'pwd':
             print(os.getcwd())
 
         elif command == 'cd':
-            if command_content == "" or command_content == "~":
+            if args_str == "" or args_str == "~":
                 os.chdir(os.path.expanduser("~"))
             else:
                 try:
-                    os.chdir(command_content)
+                    os.chdir(args_str)
                 except FileNotFoundError:
-                    sys.stderr.write(f"cd: {command_content}: No such file or directory\n")
+                    sys.stderr.write(f"cd: {args_str}: No such file or directory\n")
 
         elif command == 'type':
             found = False
             for x in builtIns:
-                if x == command_content:
-                    print(f'{command_content} is a shell builtin')
+                if x == args_str:
+                    print(f'{args_str} is a shell builtin')
                     found = True
                     break
 
@@ -64,14 +66,14 @@ def main():
                 split_paths = PATH.split(os.pathsep)
 
                 for folder_path in split_paths:
-                    file_path = folder_path +  "/" + command_content
+                    file_path = folder_path +  "/" + args_str
                     if os.access(file_path, os.X_OK):
-                        print(f'{command_content} is {file_path}')
+                        print(f'{args_str} is {file_path}')
                         found = True
                         break
                 
                 if not found:
-                    print(f'{command_content}: not found')     
+                    print(f'{args_str}: not found')     
             
         else:
             found = False
@@ -79,7 +81,7 @@ def main():
             for folder_path in split_paths:
                 file_path = folder_path + "/" + command
                 if os.access(file_path, os.X_OK):
-                    result = subprocess.run([command] + command_content.split(" "), capture_output=True, text=True)
+                    result = subprocess.run([command] + args, capture_output=True, text=True)
 
                     sys.stdout.write(result.stdout)
                     sys.stderr.write(result.stderr)
