@@ -49,7 +49,6 @@ def main():
             else:
                 try:
                     os.chdir(command_content)
-                    continue
                 except FileNotFoundError:
                     print(f"cd: {command_content}: No such file or directory")
 
