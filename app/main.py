@@ -5,8 +5,7 @@ def main():
     original_stdout = sys.stdout
     builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
 
-    while(1):
-        sys.stdout = original_stdout
+    while True:
         sys.stdout.write("$ ")
 
         # Handle command input
@@ -23,20 +22,21 @@ def main():
             else:
                 stripped_args.append(arg)
         split_command_content = stripped_args
+        command_content = " ".join(split_command_content)
 
         # Handle output redirection
+        redirect_filename = None
         if '>' in split_command_content or '1>' in split_command_content:
             if '>' in split_command_content:
                 redirect_index = split_command_content.index('>')
             else:
                 redirect_index = split_command_content.index('1>')
 
-            redirect_filename = split_command_content[redirect_index + 1]
-            sys.stdout = open(redirect_filename, 'w')
+            if redirect_index + 1 < len(split_command_content):
+                redirect_filename = split_command_content[redirect_index + 1]
+                sys.stdout = open(redirect_filename, 'w')
 
-            command_content = " ".join(split_command_content[:redirect_index])
-        else:
-            command_content =  " ".join(split_command_content)
+                command_content = " ".join(split_command_content[:redirect_index])
 
 
         # Execute built-in commands or external programs
@@ -44,10 +44,10 @@ def main():
             break
         elif command == 'echo':
             print(f"{command_content}")
-            continue
+
         elif command == 'pwd':
             print(os.getcwd())
-            continue
+
         elif command == 'cd':
             if command_content == "" or command_content == "~":
                 os.chdir(os.path.expanduser("~"))
@@ -57,7 +57,7 @@ def main():
                     continue
                 except FileNotFoundError:
                     print(f"cd: {command_content}: No such file or directory")
-                    continue
+
         elif command == 'type':
             found = False
             for x in builtIns:
@@ -65,9 +65,8 @@ def main():
                     print(f'{command_content} is a shell builtin')
                     found = True
                     break
-            if found:
-                continue 
-            else:
+
+            if not found:
                 split_paths = PATH.split(os.pathsep)
 
                 for folder_path in split_paths:
@@ -77,12 +76,9 @@ def main():
                         found = True
                         break
                 
-                if found:
-                    continue
-                else:
+                if not found:
                     print(f'{command_content}: not found')     
-                    continue
-
+            
         else:
             found = False
             split_paths = PATH.split(os.pathsep)
@@ -101,12 +97,12 @@ def main():
                 else:
                     continue       
             
-            if found:
-                continue
-            else:
+            if not found:
                 print(f"{command}: command not found")
 
-    pass
+        if redirect_filename:
+            sys.stdout.close()
+            sys.stdout = original_stdout
 
 
 if __name__ == "__main__":
