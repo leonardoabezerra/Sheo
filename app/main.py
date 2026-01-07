@@ -19,7 +19,7 @@ def main():
             print(os.getcwd())
             continue
         elif command == 'cd':
-            if command_content == "":
+            if command_content == "" or command_content == "~":
                 os.chdir(os.path.expanduser("~"))
             else:
                 try:
