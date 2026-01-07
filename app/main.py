@@ -15,10 +15,14 @@ def main():
         split_command_content = command_content.split(" ")
 
         # Strip quotes from arguments
-        for quoted_arg in split_command_content:
-            if (quoted_arg.startswith('"') and quoted_arg.endswith('"')) or \
-               (quoted_arg.startswith("'") and quoted_arg.endswith("'")):
-                command_content[split_command_content.index(quoted_arg)] = quoted_arg[1:-1] 
+        stripped_args = []
+        for arg in split_command_content:
+            if (arg.startswith('"') and arg.endswith('"')) or \
+               (arg.startswith("'") and arg.endswith("'")):
+                stripped_args.append(arg[1:-1])
+            else:
+                stripped_args.append(arg)
+        split_command_content = stripped_args
 
         # Handle output redirection
         if '>' in split_command_content or '1>' in split_command_content:
@@ -31,6 +35,9 @@ def main():
             sys.stdout = open(redirect_filename, 'w')
 
             command_content = " ".join(split_command_content[:redirect_index])
+        else:
+            command_content =  " ".join(split_command_content)
+
 
         # Execute built-in commands or external programs
         if command == 'exit':
