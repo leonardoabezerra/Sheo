@@ -47,7 +47,7 @@ def main():
                 file_path = folder_path + "/" + command
                 if os.access(file_path, os.X_OK):
                     try:
-                        result = subprocess.run([file_path] + command_content.split(" "), check=True, capture_output=True, text=True)
+                        result = subprocess.run([command] + command_content.split(" "), check=True, capture_output=True, text=True)
                         print(result.stdout)
                         found = True
                         break
