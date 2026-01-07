@@ -3,7 +3,7 @@ import sys, os, subprocess
 
 def main():
     # TODO: Uncomment the code below to pass the first stage
-    builtIns = ['echo', 'exit', 'pwd', 'type']
+    builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
     PATH = os.environ['PATH']
     while(1):
         sys.stdout.write("$ ")
@@ -18,6 +18,16 @@ def main():
         elif command == 'pwd':
             print(os.getcwd())
             continue
+        elif command == 'cd':
+            if command_content == "":
+                os.chdir(os.path.expanduser("~"))
+            else:
+                try:
+                    os.chdir(command_content)
+                    continue
+                except FileNotFoundError:
+                    print(f"cd: {command_content}: No such file or directory")
+                    continue
         elif command == 'type':
             found = False
             for x in builtIns:
