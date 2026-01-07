@@ -1,15 +1,30 @@
 import sys, os, subprocess
 
-
 def main():
-    # TODO: Uncomment the code below to pass the first stage
-    builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
     PATH = os.environ['PATH']
+    original_stdout = sys.stdout
+    builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
+
     while(1):
+        sys.stdout = original_stdout
         sys.stdout.write("$ ")
 
         command = input()
         command, _, command_content = command.partition(" ")
+        split_command_content = command_content.split(" ")
+
+        if '>' in split_command_content or '1>' in split_command_content:
+            if '>' in split_command_content:
+                redirect_index = split_command_content.index('>')
+            else:
+                redirect_index = split_command_content.index('1>')
+
+            redirect_filename = split_command_content[redirect_index + 1]
+            sys.stdout = open(redirect_filename, 'w')
+
+            command_content = " ".join(split_command_content[:redirect_index])
+
+        
         if command == 'exit':
             break
         elif command == 'echo':
