@@ -80,17 +80,13 @@ def main():
             for folder_path in split_paths:
                 file_path = folder_path + "/" + command
                 if os.access(file_path, os.X_OK):
-                    try:
-                        result = subprocess.run([command] + command_content.split(" "), check=True, capture_output=True, text=True)
-                        sys.stdout.write(result.stdout)
-                        found = True
-                        break
-                    except subprocess.CalledProcessError as err:
-                        print(f'Program failed to run with return code {err.returncode}:\n{err.stderr}')
-                        found = True
-                        break
-                else:
-                    continue       
+                    result = subprocess.run([command] + command_content.split(" "), capture_output=True, text=True)
+
+                    sys.stdout.write(result.stdout)
+                    sys.stderr.write(result.stderr)
+
+                    found = True
+                    break       
             
             if not found:
                 print(f"{command}: command not found")
