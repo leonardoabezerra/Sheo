@@ -9,10 +9,18 @@ def main():
         sys.stdout = original_stdout
         sys.stdout.write("$ ")
 
+        # Handle command input
         command = input()
         command, _, command_content = command.partition(" ")
         split_command_content = command_content.split(" ")
 
+        # Strip quotes from arguments
+        for quoted_arg in split_command_content:
+            if (quoted_arg.startswith('"') and quoted_arg.endswith('"')) or \
+               (quoted_arg.startswith("'") and quoted_arg.endswith("'")):
+                command_content[split_command_content.index(quoted_arg)] = quoted_arg[1:-1] 
+
+        # Handle output redirection
         if '>' in split_command_content or '1>' in split_command_content:
             if '>' in split_command_content:
                 redirect_index = split_command_content.index('>')
@@ -24,7 +32,7 @@ def main():
 
             command_content = " ".join(split_command_content[:redirect_index])
 
-        
+        # Execute built-in commands or external programs
         if command == 'exit':
             break
         elif command == 'echo':
