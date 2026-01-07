@@ -50,7 +50,7 @@ def main():
                 try:
                     os.chdir(command_content)
                 except FileNotFoundError:
-                    print(f"cd: {command_content}: No such file or directory")
+                    sys.stderr.write(f"cd: {command_content}: No such file or directory\n")
 
         elif command == 'type':
             found = False
@@ -91,6 +91,7 @@ def main():
                 print(f"{command}: command not found")
 
         if redirect_filename:
+            sys.stdout.flush()
             sys.stdout.close()
             sys.stdout = original_stdout
 
