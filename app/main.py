@@ -4,6 +4,7 @@ import sys, os
 def main():
     # TODO: Uncomment the code below to pass the first stage
     builtIns = ['echo', 'exit', 'type']
+    PATH=""
     while(1):
         sys.stdout.write("$ ")
 
