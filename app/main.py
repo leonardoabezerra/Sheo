@@ -3,7 +3,7 @@ import sys, os, subprocess
 
 def main():
     # TODO: Uncomment the code below to pass the first stage
-    builtIns = ['echo', 'exit', 'type']
+    builtIns = ['echo', 'exit', 'pwd', 'type']
     PATH = os.environ['PATH']
     while(1):
         sys.stdout.write("$ ")
@@ -14,6 +14,9 @@ def main():
             break
         elif command == 'echo':
             print(f"{command_content}")
+            continue
+        elif command == 'pwd':
+            print(os.getcwd())
             continue
         elif command == 'type':
             found = False
