@@ -48,7 +48,7 @@ def main():
                 if os.access(file_path, os.X_OK):
                     try:
                         result = subprocess.run([command] + command_content.split(" "), check=True, capture_output=True, text=True)
-                        print(result.stdout)
+                        sys.stdout.write(result.stdout)
                         found = True
                         break
                     except subprocess.CalledProcessError as err:
