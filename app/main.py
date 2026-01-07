@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 
 def main():
@@ -24,8 +24,20 @@ def main():
             if found:
                 continue 
             else:
-                print(f'{command_content}: not found')     
-                continue
+                split_paths = PATH.split(os.pathsep)
+
+                for folder_path in split_paths:
+                    file_path = folder_path +  "/" + command_content
+                    if os.access(file_path, os.X_OK):
+                        print(f'{command_content} is {file_path}')
+                        found = True
+                        break
+                
+                if found:
+                    continue
+                else:
+                    print(f'{command_content}: not found')     
+                    continue
 
         print(f"{command}: command not found")
 
