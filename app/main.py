@@ -91,7 +91,7 @@ def main():
             for folder_path in split_paths:
                 file_path = folder_path + "/" + command
                 if os.access(file_path, os.X_OK):
-                    result = subprocess.run([command] + args, text=True)
+                    result = subprocess.run([command] + args, capture_output=True, text=True)
 
                     sys.stdout.write(result.stdout)
                     sys.stderr.write(result.stderr)
