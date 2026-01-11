@@ -3,6 +3,8 @@ import sys, os, subprocess, shlex
 def main():
     PATH = os.environ['PATH']
     original_stdout = sys.stdout
+    original_stderr = sys.stderr
+
     builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
     redirectors = ['>', '1>', '2>']
 
@@ -23,15 +25,16 @@ def main():
 
         # Handle output redirection
         redirect_filename = None
-        if args in redirectors:
-            if '>' in args:
-                redirect_index = args.index('>')
-            elif '2>' in args:
+        redirect_index = None
+        if any(r in args for r in redirectors):
+            if '2>' in args:
                 redirect_index = args.index('2>')
-            else:
+            elif '1>' in args:
                 redirect_index = args.index('1>')
+            elif '>' in args:
+                redirect_index = args.index('>')
 
-            if redirect_index + 1 < len(args):
+            if redirect_index is not None and redirect_index + 1 < len(args):
                 redirect_filename = args[redirect_index + 1]
 
                 if (args[redirect_index] == '2>'):
@@ -88,7 +91,7 @@ def main():
             for folder_path in split_paths:
                 file_path = folder_path + "/" + command
                 if os.access(file_path, os.X_OK):
-                    result = subprocess.run([command] + args, capture_output=True, text=True)
+                    result = subprocess.run([command] + args, text=True)
 
                     sys.stdout.write(result.stdout)
                     sys.stderr.write(result.stderr)
@@ -101,8 +104,13 @@ def main():
 
         if redirect_filename:
             sys.stdout.flush()
-            sys.stdout.close()
-            sys.stdout = original_stdout
+            sys.stderr.flush()
+            if sys.stdout != original_stdout:
+                sys.stdout.close()
+                sys.stdout = original_stdout
+            if sys.stderr != original_stderr:
+                sys.stderr.close()
+                sys.stderr = original_stderr
 
 
 if __name__ == "__main__":
