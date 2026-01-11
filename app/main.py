@@ -6,7 +6,7 @@ def main():
     original_stderr = sys.stderr
 
     builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
-    redirectors = ['>', '1>', '2>']
+    redirectors = ['>', '1>', '2>', '>>', '1>>', '2>>']
 
     while True:
         sys.stdout.write("$ ")
@@ -26,20 +26,38 @@ def main():
         # Handle output redirection
         redirect_filename = None
         redirect_index = None
+        redirect_type = None
+        
         if any(r in args for r in redirectors):
-            if '2>' in args:
+            if '2>>' in args:
+                redirect_index = args.index('2>>')
+                redirect_type = '2>>'
+            elif '1>>' in args:
+                redirect_index = args.index('1>>')
+                redirect_type = '1>>'
+            elif '>>' in args:
+                redirect_index = args.index('>>')
+                redirect_type = '1>>'
+            elif '2>' in args:
                 redirect_index = args.index('2>')
+                redirect_type = '2>'
             elif '1>' in args:
                 redirect_index = args.index('1>')
+                redirect_type = '1>'
             elif '>' in args:
                 redirect_index = args.index('>')
+                redirect_type = '1>'
 
             if redirect_index is not None and redirect_index + 1 < len(args):
                 redirect_filename = args[redirect_index + 1]
 
-                if (args[redirect_index] == '2>'):
+                if (redirect_type == '2>>'):
+                    sys.stderr = open(redirect_filename, 'a')
+                elif (redirect_type ==  '1>>'):
+                    sys.stdout = open(redirect_filename, 'a')
+                elif (redirect_type == '2>'):
                     sys.stderr = open(redirect_filename, 'w')
-                else:
+                elif (redirect_type == '1>'):
                     sys.stdout = open(redirect_filename, 'w')
                 
                 args = args[:redirect_index]
