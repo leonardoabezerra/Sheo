@@ -4,6 +4,7 @@ def main():
     PATH = os.environ['PATH']
     original_stdout = sys.stdout
     builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
+    redirectors = ['>', '1>', '2>']
 
     while True:
         sys.stdout.write("$ ")
@@ -22,16 +23,22 @@ def main():
 
         # Handle output redirection
         redirect_filename = None
-        if '>' in args or '1>' in args:
+        if args in redirectors:
             if '>' in args:
                 redirect_index = args.index('>')
+            elif '2>' in args:
+                redirect_index = args.index('2>')
             else:
                 redirect_index = args.index('1>')
 
             if redirect_index + 1 < len(args):
                 redirect_filename = args[redirect_index + 1]
-                sys.stdout = open(redirect_filename, 'w')
 
+                if (redirectors[redirect_index] == '2>'):
+                    sys.stderr = open(redirect_filename, 'w')
+                else:
+                    sys.stdout = open(redirect_filename, 'w')
+                
                 args = args[:redirect_index]
                 args_str = " ".join(args)
 
