@@ -34,7 +34,7 @@ def main():
             if redirect_index + 1 < len(args):
                 redirect_filename = args[redirect_index + 1]
 
-                if (redirectors[redirect_index] == '2>'):
+                if (args[redirect_index] == '2>'):
                     sys.stderr = open(redirect_filename, 'w')
                 else:
                     sys.stdout = open(redirect_filename, 'w')
