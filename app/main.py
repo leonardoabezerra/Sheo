@@ -24,9 +24,7 @@ def activate_autocompletion():
         if state < len(options):
             matches = options[state]
 
-            if len(matches) == 1:
-                return matches + " "
-            return matches
+            return matches + " "
 
         return None
     
