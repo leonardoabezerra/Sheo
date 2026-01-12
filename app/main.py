@@ -24,10 +24,13 @@ def activate_autocompletion():
         if state < len(options):
             matches = options[state]
 
-            return matches + " "
+            if len(matches) == 1:
+                return matches + " "
+            return matches
 
         return None
     
+    readline.set_completer_delims('\t\n`@$><=;|&{(')  # Remove space from delimiters
     readline.set_completer(complete)
     readline.parse_and_bind('tab: complete')
 
