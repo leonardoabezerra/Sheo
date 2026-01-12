@@ -1,11 +1,39 @@
-import sys, os, subprocess, shlex
+import sys, os, subprocess, shlex, readline
+
+BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type']
+PATH = os.environ['PATH']
+
+
+def activate_autocompletion():
+    path_executables = set()
+    paths = PATH.split(os.pathsep)
+
+    for path in paths:
+        if os.path.isdir(path):
+            try:
+                for file in os.listdir(path):
+                    path_executables.add(file)
+            except PermissionError:
+                continue
+    
+    all_commands = sorted(list(set(BUILTINS) | path_executables))
+
+    def complete(text, state):
+        options = [command for command in all_commands if command.startswith(text)]
+
+        if state < len(options):
+            return options[state]
+        return None
+
+    readline.set_completer(complete)
+    readline.parse_and_bind('tab: complete')
 
 def main():
-    PATH = os.environ['PATH']
+    activate_autocompletion()
+
     original_stdout = sys.stdout
     original_stderr = sys.stderr
 
-    builtIns = ['echo', 'exit', 'pwd', 'cd', 'type']
     redirectors = ['>', '1>', '2>', '>>', '1>>', '2>>']
 
     while True:
@@ -27,7 +55,7 @@ def main():
         redirect_filename = None
         redirect_index = None
         redirect_type = None
-        
+
         if any(r in args for r in redirectors):
             if '2>>' in args:
                 redirect_index = args.index('2>>')
@@ -84,7 +112,7 @@ def main():
 
         elif command == 'type':
             found = False
-            for x in builtIns:
+            for x in BUILTINS:
                 if x == args_str:
                     print(f'{args_str} is a shell builtin')
                     found = True
