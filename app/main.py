@@ -19,7 +19,7 @@ def activate_autocompletion():
     all_commands = sorted(list(set(BUILTINS) | path_executables))
 
     def complete(text, state):
-        options = [command for command in all_commands if command.startswith(text)]
+        options = [command + ' ' for command in all_commands if command.startswith(text)]
 
         if state < len(options):
             return options[state]
