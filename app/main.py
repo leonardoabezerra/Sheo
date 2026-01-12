@@ -42,10 +42,12 @@ def main():
     redirectors = ['>', '1>', '2>', '>>', '1>>', '2>>']
 
     while True:
-        sys.stdout.write("$ ")
+        try:
+            input_line = input("$ ")
+        except (EOFError, KeyboardInterrupt):
+            break
 
         # Handle command input
-        input_line = input()
         full_command = shlex.split(input_line)
 
         if not full_command: 
