@@ -1,4 +1,4 @@
-import sys, os, subprocess, shlex, readline
+import sys, os, subprocess, shlex, readline, rlcompleter
 
 BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type']
 PATH = os.environ['PATH']
@@ -22,10 +22,14 @@ def activate_autocompletion():
         options = [command for command in all_commands if command.startswith(text)]
 
         if state < len(options):
-            return options[state]
-        return None
+            matches = options[state]
 
-    readline.set_completion_append_character(' ')
+            if len(matches) == 1:
+                return matches + " "
+            return matches
+
+        return None
+    
     readline.set_completer(complete)
     readline.parse_and_bind('tab: complete')
 
