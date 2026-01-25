@@ -84,18 +84,16 @@ def execute_builtin(command, args):
             return True
         
         elif command == 'history':
-            if isinstance(args[0], int): # check if first argument is integer
-                n = args[0]
-                history_to_show = history[-n:]
-            else: history_to_show = history
-
-            for index, cmd in enumerate(history_to_show):
-                print(f'    {index + 1} {cmd}')
+            for index, cmd in enumerate(history):
+                if args != "":
+                    if index >= len(history) - int(args[0]):
+                        print(f'    {index + 1} {cmd}')
+                else:
+                    print(f'    {index + 1} {cmd}')
             return True
             
         else:
             return False  # Not a built-in command
-
 
 
 def main():
