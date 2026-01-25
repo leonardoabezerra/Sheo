@@ -161,43 +161,25 @@ def main():
                 
                 # Handle output redirection
                 redirect_filename = None
-                redirect_index = None
-                redirect_type = None
+                
+                for redirector in REDIRECTORS:
+                        if redirector in cmd_args:
+                            redirect_index = cmd_args.index(redirector)
 
-                if any(r in cmd_args for r in REDIRECTORS):
-                    if '2>>' in cmd_args:
-                        redirect_index = cmd_args.index('2>>')
-                        redirect_type = '2>>'
-                    elif '1>>' in cmd_args:
-                        redirect_index = cmd_args.index('1>>')
-                        redirect_type = '1>>'
-                    elif '>>' in cmd_args:
-                        redirect_index = cmd_args.index('>>')
-                        redirect_type = '1>>'
-                    elif '2>' in cmd_args:
-                        redirect_index = cmd_args.index('2>')
-                        redirect_type = '2>'
-                    elif '1>' in cmd_args:
-                        redirect_index = cmd_args.index('1>')
-                        redirect_type = '1>'
-                    elif '>' in cmd_args:
-                        redirect_index = cmd_args.index('>')
-                        redirect_type = '1>'
+                            if redirect_index + 1 < len(cmd_args):
+                                redirect_filename = cmd_args[redirect_index + 1]                
+                                rmode = 'a' if '>>' in redirector else 'w'
+                                rtarget = 2 if '2' in redirector else 1
 
-                    if redirect_index is not None and redirect_index + 1 < len(cmd_args):
-                        redirect_filename = cmd_args[redirect_index + 1]
+                                f = open(redirect_filename, rmode)
+                                os.dup2(f.fileno(), rtarget)
+                                f.close()
 
-                        if (redirect_type == '2>>'):
-                            sys.stderr = open(redirect_filename, 'a')
-                        elif (redirect_type ==  '1>>'):
-                            sys.stdout = open(redirect_filename, 'a')
-                        elif (redirect_type == '2>'):
-                            sys.stderr = open(redirect_filename, 'w')
-                        elif (redirect_type == '1>'):
-                            sys.stdout = open(redirect_filename, 'w')
-                        
-                        cmd_args = cmd_args[:redirect_index]   
+                                cmd_args = cmd_args[:redirect_index]   
+                                break
 
+
+                # Execute command                    
                 if execute_builtin(cmd_name, cmd_args): 
                     os._exit(0) # kill child 
 
@@ -216,7 +198,7 @@ def main():
                     
                 if found_path:
                     try:
-                        os.execv(found_path, cmd_parts)
+                        os.execv(found_path, [cmd_name] + cmd_args)
                     except Exception as err:
                         sys.stderr.write(f"Error executing {cmd_name}: {err}\n")
                         os._exit(1)
