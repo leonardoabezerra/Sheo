@@ -4,6 +4,7 @@ PATH = os.environ['PATH']
 BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type', 'history']
 REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
 
+history = []
 
 def activate_autocompletion():
     path_executables = set()
@@ -81,6 +82,11 @@ def execute_builtin(command, args):
                 if not found:
                     print(f'{args_str}: not found')     
             return True
+        
+        elif command == 'history':
+            for index, cmd in enumerate(history):
+                print(f'    {index + 1} {cmd}')
+            return True
             
         else:
             return False  # Not a built-in command
@@ -90,9 +96,6 @@ def execute_builtin(command, args):
 def main():
     activate_autocompletion()
 
-    original_stdout = sys.stdout
-    original_stderr = sys.stderr
-
     while True:
         try:
             input_line = input("$ ")
@@ -101,8 +104,9 @@ def main():
 
         if not input_line: continue
 
+        history.append(input_line) # Add input to history
+
         # Handle command input
-            
         full_command = shlex.split(input_line)
 
         if not full_command: 
@@ -222,17 +226,6 @@ def main():
                 os.waitpid(pid, 0)
             except ChildProcessError:
                 pass
-
-        # Reset redirection
-        if redirect_filename:
-            sys.stdout.flush()
-            sys.stderr.flush()
-            if sys.stdout != original_stdout:
-                sys.stdout.close()
-                sys.stdout = original_stdout
-            if sys.stderr != original_stderr:
-                sys.stderr.close()
-                sys.stderr = original_stderr
 
 if __name__ == "__main__":
     main()
