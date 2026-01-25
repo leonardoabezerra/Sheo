@@ -136,48 +136,6 @@ def main():
 
         for i, cmd_parts in enumerate(command_chain):
             
-            cmd_name = cmd_parts[0]
-            cmd_args = cmd_parts[1:]
-
-            # Handle output redirection
-            redirect_filename = None
-            redirect_index = None
-            redirect_type = None
-
-            if any(r in cmd_args for r in REDIRECTORS):
-                if '2>>' in cmd_args:
-                    redirect_index = cmd_args.index('2>>')
-                    redirect_type = '2>>'
-                elif '1>>' in cmd_args:
-                    redirect_index = cmd_args.index('1>>')
-                    redirect_type = '1>>'
-                elif '>>' in cmd_args:
-                    redirect_index = cmd_args.index('>>')
-                    redirect_type = '1>>'
-                elif '2>' in cmd_args:
-                    redirect_index = cmd_args.index('2>')
-                    redirect_type = '2>'
-                elif '1>' in cmd_args:
-                    redirect_index = cmd_args.index('1>')
-                    redirect_type = '1>'
-                elif '>' in cmd_args:
-                    redirect_index = cmd_args.index('>')
-                    redirect_type = '1>'
-
-                if redirect_index is not None and redirect_index + 1 < len(cmd_args):
-                    redirect_filename = cmd_args[redirect_index + 1]
-
-                    if (redirect_type == '2>>'):
-                        sys.stderr = open(redirect_filename, 'a')
-                    elif (redirect_type ==  '1>>'):
-                        sys.stdout = open(redirect_filename, 'a')
-                    elif (redirect_type == '2>'):
-                        sys.stderr = open(redirect_filename, 'w')
-                    elif (redirect_type == '1>'):
-                        sys.stdout = open(redirect_filename, 'w')
-                    
-                    cmd_args = cmd_args[:redirect_index]
-            
             is_last = (i == len(command_chain) - 1)
             r, w = 0, 0
 
@@ -195,6 +153,48 @@ def main():
                     os.dup2(w, 1)
                     os.close(w)
                     os.close(r)
+
+                cmd_name = cmd_parts[0]
+                cmd_args = cmd_parts[1:]
+                
+                # Handle output redirection
+                redirect_filename = None
+                redirect_index = None
+                redirect_type = None
+
+                if any(r in cmd_args for r in REDIRECTORS):
+                    if '2>>' in cmd_args:
+                        redirect_index = cmd_args.index('2>>')
+                        redirect_type = '2>>'
+                    elif '1>>' in cmd_args:
+                        redirect_index = cmd_args.index('1>>')
+                        redirect_type = '1>>'
+                    elif '>>' in cmd_args:
+                        redirect_index = cmd_args.index('>>')
+                        redirect_type = '1>>'
+                    elif '2>' in cmd_args:
+                        redirect_index = cmd_args.index('2>')
+                        redirect_type = '2>'
+                    elif '1>' in cmd_args:
+                        redirect_index = cmd_args.index('1>')
+                        redirect_type = '1>'
+                    elif '>' in cmd_args:
+                        redirect_index = cmd_args.index('>')
+                        redirect_type = '1>'
+
+                    if redirect_index is not None and redirect_index + 1 < len(cmd_args):
+                        redirect_filename = cmd_args[redirect_index + 1]
+
+                        if (redirect_type == '2>>'):
+                            sys.stderr = open(redirect_filename, 'a')
+                        elif (redirect_type ==  '1>>'):
+                            sys.stdout = open(redirect_filename, 'a')
+                        elif (redirect_type == '2>'):
+                            sys.stderr = open(redirect_filename, 'w')
+                        elif (redirect_type == '1>'):
+                            sys.stdout = open(redirect_filename, 'w')
+                        
+                        cmd_args = cmd_args[:redirect_index]   
 
                 if execute_builtin(cmd_name, cmd_args): 
                     os._exit(0) # kill child 
