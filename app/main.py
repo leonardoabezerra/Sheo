@@ -134,6 +134,8 @@ def main():
         input_fd = 0
         pids = []
 
+        redirect_filename = None
+
         for i, cmd_parts in enumerate(command_chain):
             
             is_last = (i == len(command_chain) - 1)
