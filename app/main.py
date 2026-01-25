@@ -84,7 +84,12 @@ def execute_builtin(command, args):
             return True
         
         elif command == 'history':
-            for index, cmd in enumerate(history):
+            if isinstance(args[0], int): # check if first argument is integer
+                n = args[0]
+                history_to_show = history[-n:]
+            else: history_to_show = history
+
+            for index, cmd in enumerate(history_to_show):
                 print(f'    {index + 1} {cmd}')
             return True
             
