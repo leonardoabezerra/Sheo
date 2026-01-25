@@ -85,7 +85,7 @@ def execute_builtin(command, args):
         
         elif command == 'history':
             for index, cmd in enumerate(history):
-                if args != "":
+                if args:
                     if index >= len(history) - int(args[0]):
                         print(f'    {index + 1} {cmd}')
                 else:
