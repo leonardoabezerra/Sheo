@@ -1,7 +1,7 @@
 import sys, os, shlex, readline
 
 PATH = os.environ['PATH']
-BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type']
+BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type', 'history']
 REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
 
 
