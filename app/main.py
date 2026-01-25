@@ -80,7 +80,7 @@ def execute_builtin(command, args):
                 
                 if not found:
                     print(f'{args_str}: not found')     
-                return True
+            return True
             
         else:
             return False  # Not a built-in command
