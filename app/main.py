@@ -55,11 +55,24 @@ def load_histfile():
         sys.stderr.write(f'Error loading history file: {err}\n')
 
 
+def update_histfile():
+    try:
+        with open(HISTFILE, 'a') as hfile:
+            joined_history = '\n'.join(history)
+            hfile.write(joined_history)
+            hfile.write('\n')
+    except FileNotFoundError:
+        pass # HISTFILE environment variable is not necessary
+    except Exception as err:
+        sys.stderr.write(f'Error updating history file: {err}\n')
+
+
 def execute_builtin(command, args):
         args_str = " ".join(args)
 
         # Execute built-in commands or external programs
         if command == 'exit':
+            update_histfile()
             sys.exit(0)
         elif command == 'echo':
             print(f"{args_str}")
