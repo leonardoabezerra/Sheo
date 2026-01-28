@@ -3,7 +3,7 @@ import sys, os, shlex, readline
 PATH = os.environ['PATH']
 BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type', 'history']
 REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
-SHELL_STATE_ARGS = ['-r', '-w']
+SHELL_STATE_ARGS = ['-r', '-w', '-a']
 
 history = []
 
@@ -101,8 +101,8 @@ def execute_builtin(command, args):
                 except Exception as err:
                     sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
                     return True
-            
-            elif len(args) > 1 and args[0] == '-w':
+
+            elif len(args) > 1 and (args[0] == '-w' or args[0] == '-a'):
                 path_to_hfile = args[1]
                 try:
                     with open(path_to_hfile, 'a') as hfile:
