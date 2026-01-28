@@ -91,7 +91,7 @@ def execute_builtin(command, args):
                         for line in hfile:
                             line = line.strip()
                             if line:
-                                readline.add_history(line)
+                                readline.add_history(line) # Necessary for arrow navigation
                                 history.append(line)     
                         return True
                 except FileNotFoundError:
@@ -125,7 +125,6 @@ def main():
         if not input_line: continue
 
         history.append(input_line) # Add input to history
-        readline.add_history(input_line) # Syncronize readline history for arrow navigation
 
         # Handle command input
         full_command = shlex.split(input_line)
