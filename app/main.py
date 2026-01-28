@@ -1,7 +1,7 @@
 import sys, os, shlex, readline
 
 PATH = os.environ['PATH']
-HISTFILE = os.environ['HISTFILE']
+HISTFILE = os.environ['HISTFILE'] if 'HISTFILE' in os.environ else ""
 BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type', 'history']
 REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
 SHELL_STATE_ARGS = ['-r', '-w', '-a']
