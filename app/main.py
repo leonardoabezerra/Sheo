@@ -84,7 +84,7 @@ def execute_builtin(command, args):
             return True
         
         elif command == 'history':
-            if args[0] == '-r':
+            if len(args) > 0 and args[0] == '-r':
                 path_to_hfile = args[1]
                 try:
                     with open(path_to_hfile, 'r') as hfile:
@@ -99,7 +99,7 @@ def execute_builtin(command, args):
                     return True
             
             for index, cmd in enumerate(history):
-                if args and args[0].isdigit():
+                if len(args) > 0 and args[0].isdigit():
                     if index >= len(history) - int(args[0]):
                         print(f'    {index + 1} {cmd}')
                 else:
