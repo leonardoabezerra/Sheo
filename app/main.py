@@ -3,6 +3,7 @@ import sys, os, shlex, readline
 PATH = os.environ['PATH']
 BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type', 'history']
 REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
+SHELL_STATE_ARGS = ['-r', '-w']
 
 history = []
 
@@ -84,7 +85,7 @@ def execute_builtin(command, args):
             return True
         
         elif command == 'history':
-            if len(args) > 0 and args[0] == '-r':
+            if len(args) > 1 and args[0] == '-r':
                 path_to_hfile = args[1]
                 try:
                     with open(path_to_hfile, 'r') as hfile:
@@ -93,6 +94,21 @@ def execute_builtin(command, args):
                             if line:
                                 readline.add_history(line) # Necessary for arrow navigation
                                 history.append(line)     
+                        return True
+                except FileNotFoundError:
+                    sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
+                    return True
+                except Exception as err:
+                    sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
+                    return True
+            
+            elif len(args) > 1 and args[0] == '-w':
+                path_to_hfile = args[1]
+                try:
+                    with open(path_to_hfile, 'a') as hfile:
+                        joined_history = '\n'.join(history)
+                        hfile.write(joined_history)
+                        hfile.write('\n')
                         return True
                 except FileNotFoundError:
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
@@ -150,7 +166,7 @@ def main():
             cmd_name = command_chain[0][0]
             cmd_args = command_chain[0][1:]
             
-            if cmd_name in ['cd', 'exit'] or (cmd_name == 'history' and (len(cmd_args) > 0 and cmd_args[0] == '-r')):
+            if cmd_name in ['cd', 'exit'] or (cmd_name == 'history' and (len(cmd_args) > 0 and cmd_args[0] in SHELL_STATE_ARGS)):
                 execute_builtin(cmd_name, cmd_args)
                 continue
 
