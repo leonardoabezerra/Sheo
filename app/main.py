@@ -6,6 +6,7 @@ REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
 SHELL_STATE_ARGS = ['-r', '-w', '-a']
 
 history = []
+history_append = []
 
 def activate_autocompletion():
     path_executables = set()
@@ -94,6 +95,7 @@ def execute_builtin(command, args):
                             if line:
                                 readline.add_history(line) # Necessary for arrow navigation
                                 history.append(line)     
+                                history_append.append(line)
                         return True
                 except FileNotFoundError:
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
@@ -102,10 +104,10 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
                     return True
 
-            elif len(args) > 1 and (args[0] == '-w' or args[0] == '-a'):
+            elif len(args) > 1 and args[0] == '-w':
                 path_to_hfile = args[1]
                 try:
-                    with open(path_to_hfile, 'a') as hfile:
+                    with open(path_to_hfile, 'w') as hfile:
                         joined_history = '\n'.join(history)
                         hfile.write(joined_history)
                         hfile.write('\n')
@@ -117,6 +119,24 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
                     return True
             
+            elif len(args) > 1 and args[0] == '-a':
+                path_to_hfile = args[1]
+                try:
+                    with open(path_to_hfile, 'a') as hfile:
+                        joined_history = '\n'.join(history_append)
+                        hfile.write(joined_history)
+                        hfile.write('\n')
+                        history_append.clear()
+                        return True
+                except FileNotFoundError:
+                    sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
+                    return True
+                except Exception as err:
+                    sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
+                    return True
+
+
+
             for index, cmd in enumerate(history):
                 if len(args) > 0 and args[0].isdigit():
                     if index >= len(history) - int(args[0]):
@@ -141,6 +161,7 @@ def main():
         if not input_line: continue
 
         history.append(input_line) # Add input to history
+        history_append.append(input_line) # Recent history for -a option
 
         # Handle command input
         full_command = shlex.split(input_line)
