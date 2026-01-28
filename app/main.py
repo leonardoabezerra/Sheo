@@ -1,12 +1,14 @@
 import sys, os, shlex, readline
 
 PATH = os.environ['PATH']
+HISTFILE = os.environ['HISTFILE']
 BUILTINS = ['echo', 'exit', 'pwd', 'cd', 'type', 'history']
 REDIRECTORS = ['>', '1>', '2>', '>>', '1>>', '2>>']
 SHELL_STATE_ARGS = ['-r', '-w', '-a']
 
 history = []
 history_append = []
+
 
 def activate_autocompletion():
     path_executables = set()
@@ -38,8 +40,22 @@ def activate_autocompletion():
     readline.parse_and_bind('tab: complete')
 
 
-def execute_builtin(command, args):
+def load_histfile():
+    try:
+        with open(HISTFILE, 'r') as hfile:
+            for line in hfile:
+                line = line.strip()
+                if line:
+                    readline.add_history(line) # Necessary for arrow navigation
+                    history.append(line)
+                    history_append.append(line)
+    except FileNotFoundError:
+        pass  # HISTFILE environment variable is not necessary
+    except Exception as err:
+        sys.stderr.write(f'Error loading history file: {err}\n')
 
+
+def execute_builtin(command, args):
         args_str = " ".join(args)
 
         # Execute built-in commands or external programs
@@ -151,6 +167,7 @@ def execute_builtin(command, args):
 
 def main():
     activate_autocompletion()
+    load_histfile()
 
     while True:
         try:
