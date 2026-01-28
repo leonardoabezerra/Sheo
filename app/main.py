@@ -91,11 +91,14 @@ def execute_builtin(command, args):
                         for line in hfile:
                             line = line.strip()
                             if line:
-                                history.append(line)     
                                 readline.add_history(line)
+                                history.append(line)     
                         return True
                 except FileNotFoundError:
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
+                    return True
+                except Exception as err:
+                    sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
                     return True
             
             for index, cmd in enumerate(history):
@@ -121,10 +124,8 @@ def main():
 
         if not input_line: continue
 
-
-        if not '-r' in input_line:
-            history.append(input_line) # Add input to history
-            readline.add_history(input_line) # Syncronize readline history for arrow navigation
+        history.append(input_line) # Add input to history
+        readline.add_history(input_line) # Syncronize readline history for arrow navigation
 
         # Handle command input
         full_command = shlex.split(input_line)
@@ -150,7 +151,7 @@ def main():
             cmd_name = command_chain[0][0]
             cmd_args = command_chain[0][1:]
             
-            if cmd_name in ['cd', 'exit']:
+            if cmd_name in ['cd', 'exit'] or (cmd_name == 'history' and (len(cmd_args) > 0 and cmd_args[0] == '-r')):
                 execute_builtin(cmd_name, cmd_args)
                 continue
 
