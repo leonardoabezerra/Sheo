@@ -9,16 +9,19 @@ SHELL_STATE_ARGS = ['-r', '-w', '-a']
 history = []
 history_append = []
 
+# Terminal colors
 class Colors:
     CYAN = '\033[96m'
     BLUE = '\033[94m'
     ERROR = '\033[91m'
     RESET = '\033[0m'
 
+
 def activate_autocompletion():
     path_executables = set()
     paths = PATH.split(os.pathsep)
 
+    # Collect all executable files in PATH directories
     for path in paths:
         if os.path.isdir(path):
             try:
@@ -30,6 +33,7 @@ def activate_autocompletion():
     all_commands = sorted(list(set(BUILTINS) | path_executables))
 
     def complete(text, state):
+        # Generate possible matches
         options = [command for command in all_commands if command.startswith(text)]
 
         if state < len(options):
@@ -40,11 +44,13 @@ def activate_autocompletion():
             return matches
 
         return None
-    
+
+    # Configure readline for tab completion    
     readline.set_completer(complete)    
     readline.parse_and_bind('tab: complete')
 
 
+# Load history from HISTFILE
 def load_histfile():
     try:
         with open(HISTFILE, 'r') as hfile:
@@ -60,9 +66,10 @@ def load_histfile():
         sys.stderr.write(f'{Colors.ERROR}Error loading history file: {err}\n')
 
 
+# Update HISTFILE with current history
 def update_histfile():
     try:
-        with open(HISTFILE, 'w') as hfile:
+        with open(HISTFILE, 'w') as hfile: # Overwrite existing history with current session history
             joined_history = '\n'.join(history)
             hfile.write(joined_history)
             hfile.write('\n')
@@ -72,23 +79,24 @@ def update_histfile():
         sys.stderr.write(f'{Colors.ERROR}Error updating history file: {err}\n')
 
 
-def execute_builtin(command, args):
+def execute_builtin(command, args):  # Returns True if executed
         args_str = " ".join(args)
 
-        # Execute built-in commands or external programs
-        if command == 'exit':
+        # Execute built-in commands
+        if command == 'exit':  # Exit shell
             update_histfile()
             print(f"{Colors.CYAN}Sheo{Colors.RESET}$ Bye :D")
             sys.exit(0)
-        elif command == 'echo':
+
+        elif command == 'echo':  # Print arguments
             print(f"{args_str}")
             return True
 
-        elif command == 'pwd':
+        elif command == 'pwd':  # Print working directory
             print(os.getcwd())
             return True
 
-        elif command == 'cd':
+        elif command == 'cd':  # Change directory
             if args_str == "" or args_str == "~":
                 os.chdir(os.path.expanduser("~"))
             else:
@@ -98,7 +106,7 @@ def execute_builtin(command, args):
                     sys.stderr.write(f"cd: {args_str}: No such file or directory\n")
             return True
 
-        elif command == 'type':
+        elif command == 'type':  # Identify command type
             found = False
             for x in BUILTINS:
                 if x == args_str:
@@ -106,7 +114,7 @@ def execute_builtin(command, args):
                     found = True
                     break
 
-            if not found:
+            if not found:  # Check in PATH for external binaries
                 split_paths = PATH.split(os.pathsep)
 
                 for folder_path in split_paths:
@@ -120,8 +128,8 @@ def execute_builtin(command, args):
                     print(f'{args_str}: not found')     
             return True
         
-        elif command == 'history':
-            if len(args) > 1 and args[0] == '-r':
+        elif command == 'history':  # Show command history
+            if len(args) > 1 and args[0] == '-r':  # Read history from file
                 path_to_hfile = args[1]
                 try:
                     with open(path_to_hfile, 'r') as hfile:
@@ -139,7 +147,7 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'{Colors.ERROR}history: {path_to_hfile}: {err}\n')
                     return True
 
-            elif len(args) > 1 and args[0] == '-w':
+            elif len(args) > 1 and args[0] == '-w':  # Write history to file
                 path_to_hfile = args[1]
                 try:
                     with open(path_to_hfile, 'w') as hfile:
@@ -154,14 +162,14 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'{Colors.ERROR}history: {path_to_hfile}: {err}\n')
                     return True
             
-            elif len(args) > 1 and args[0] == '-a':
+            elif len(args) > 1 and args[0] == '-a':  # Append recent history to file
                 path_to_hfile = args[1]
                 try:
                     with open(path_to_hfile, 'a') as hfile:
                         joined_history = '\n'.join(history_append)
                         hfile.write(joined_history)
                         hfile.write('\n')
-                        history_append.clear()
+                        history_append.clear()  # Clear recent history after appending
                         return True
                 except FileNotFoundError:
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
@@ -170,8 +178,7 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'{Colors.ERROR}history: {path_to_hfile}: {err}\n')
                     return True
 
-
-
+            # Default: print history
             for index, cmd in enumerate(history):
                 if len(args) > 0 and args[0].isdigit():
                     if index >= len(history) - int(args[0]):
@@ -188,6 +195,7 @@ def main():
     activate_autocompletion()
     load_histfile()
 
+    # Main shell loop (REPL)
     while True:
 
         # Prepare input prompt
@@ -233,6 +241,7 @@ def main():
             cmd_name = command_chain[0][0]
             cmd_args = command_chain[0][1:]
             
+            # Built-in commands that affect shell state
             if cmd_name in ['cd', 'exit'] or (cmd_name == 'history' and (len(cmd_args) > 0 and cmd_args[0] in SHELL_STATE_ARGS)):
                 execute_builtin(cmd_name, cmd_args)
                 continue
@@ -241,12 +250,11 @@ def main():
         input_fd = 0
         pids = []
 
-        redirect_filename = None
-
+        # Create processes for each command in the pipeline
         for i, cmd_parts in enumerate(command_chain):
             
             is_last = (i == len(command_chain) - 1)
-            r, w = 0, 0
+            r, w = 0, 0  # Initialize pipe fds
 
             if not is_last:
                 r, w = os.pipe()
@@ -254,10 +262,12 @@ def main():
             pid = os.fork()
 
             if pid == 0:  # Child
+                # Setup input from previous command
                 if input_fd != 0:
                     os.dup2(input_fd, 0)
                     os.close(input_fd)
 
+                # Setup output to next command
                 if not is_last:
                     os.dup2(w, 1)
                     os.close(w)
@@ -273,16 +283,18 @@ def main():
                         if redirector in cmd_args:
                             redirect_index = cmd_args.index(redirector)
 
+                            # Ensure there is a filename after the redirector
                             if redirect_index + 1 < len(cmd_args):
                                 redirect_filename = cmd_args[redirect_index + 1]                
                                 rmode = 'a' if '>>' in redirector else 'w'
                                 rtarget = 2 if '2' in redirector else 1
 
+                                # Perform redirection
                                 f = open(redirect_filename, rmode)
                                 os.dup2(f.fileno(), rtarget)
                                 f.close()
 
-                                cmd_args = cmd_args[:redirect_index]   
+                                cmd_args = cmd_args[:redirect_index]
                                 break
 
 
@@ -290,12 +302,13 @@ def main():
                 if execute_builtin(cmd_name, cmd_args): 
                     os._exit(0) # kill child 
 
+                # Search for external command in PATH
                 found_path = None
 
                 if os.sep in cmd_name:
                     if os.access(cmd_name, os.X_OK):
                         found_path = cmd_name
-                else:
+                else:  #  Search in PATH
                     split_paths = PATH.split(os.pathsep)
                     for folder_path in split_paths:
                         file_path = folder_path + "/" + cmd_name
@@ -305,7 +318,7 @@ def main():
                     
                 if found_path:
                     try:
-                        os.execv(found_path, [cmd_name] + cmd_args)
+                        os.execv(found_path, [cmd_name] + cmd_args)  # Execute external command
                     except Exception as err:
                         sys.stderr.write(f"{Colors.ERROR}Error executing {cmd_name}: {err}\n")
                         os._exit(1)
@@ -316,9 +329,11 @@ def main():
             else: # Parent
                 pids.append(pid)
 
+                # Close unused fds
                 if input_fd != 0:
                     os.close(input_fd)
 
+                # Setup input for next command
                 if not is_last:
                     os.close(w)
                     input_fd = r
