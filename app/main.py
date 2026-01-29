@@ -57,7 +57,7 @@ def load_histfile():
 
 def update_histfile():
     try:
-        with open(HISTFILE, 'a') as hfile:
+        with open(HISTFILE, 'w') as hfile:
             joined_history = '\n'.join(history)
             hfile.write(joined_history)
             hfile.write('\n')
