@@ -7,7 +7,7 @@ Sheo is a simple shell application I created based on Unix shells. This applicat
 
 <br>
 
-# Sheo, a linux-based pyhon-written shell application
+# Sheo, a linux-based python-written shell application
 This custom comand-line interface (CLI) built with Python replicates core Unix shell functionalities. This project demonstrates low-level systems programming concepts, including **process management, file descriptor manipulation, and inter-process communication (IPC)**.
 
 <br>
