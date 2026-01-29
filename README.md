@@ -1,34 +1,81 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/b54620ed-e52c-4371-acf3-0e7f6e443325)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+<img width="1800" height="920" alt="Sheo_" src="https://github.com/user-attachments/assets/3199e201-3520-4296-b5a2-e283f85190b1" />
 
-This is a starting point for Python solutions to the
-["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
+<br>
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+# About the Project
+Sheo is a simple shell application I created based on Unix shells. This application was created as a way of better comprehending command-line interpreters and how operating systems handle processes, memory and file streams while practicing some Python programming. I constructed it with the help of code crafters, which I used to test the code and as a guide to which functionalities I should develop in this project to optimize my learning experience.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+<br>
 
-# Passing the first stage
+# Sheo, a linux-based pyhon-written shell application
+This custom comand-line interface (CLI) built with Python replicates core Unix shell functionalities. This project demonstrates low-level systems programming concepts, including **process management, file descriptor manipulation, and inter-process communication (IPC)**.
 
-The entry point for your `shell` implementation is in `app/main.py`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+<br>
 
+## Key features
+- **Command Execution & Lifecycle:** Implements a full REPL (Read-Eval-Print Loop) using `os.fork()` and `os.execv()` to manage child processes for external binaries.
+- **Advanced Piping & Redirection:** Supports complex command chaining through `os.pipe()`. Includes output redirection for `stdout` and `stderr`, supporting both overwrite (`>`) and append (`>>`) modes.
+- **Dynamic Tab-Autocompletion & History:** Supports autocompletion for system binaries and built-in commands, as well as command history navigation through arrow up (`↑`) and down (`↓`). Also includes history file management through the `history` command and environment variables.
+- **Internaa Built-Ins:** Custom implementation of essential shell commands.
+- **Robust Parsing:** Ensures correct handling of quotes, escapes and complex arguments.
+
+<br>
+
+## Technical Deep Dive
+- **Process Synchronization:** Managed parent-child process relationship through `os.waitpid()` to avoid "zombie" processes.
+- **Environment Handling:** Dynamically crawls the system `$PATH` to index executables for autocompletion and command execution.
+- **File Descriptor Logic:** Implemented `os.dup2` to conduct the transfer of data between piped processes and files.
+
+<br>
+
+## How to run the code
+### Prerequisites
+- Python 3
+- Unix-based OS (Like linux or macOS)
+
+### Running the Shell
+1. Clone this repository:
+   ```sh
+   git clone https://github.com/leonardoabezerra/Sheo.git
+   cd Sheo
+   ```
+2. Launch the Shell:
+   ```sh
+   python3 app/main.py
+   ```
+   
+### Example usage
 ```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+$ ls -la | grep ".py" > python_files.txt
+$ cat python files.txt
+$ history 5
 ```
 
-Time to move on to the next stage!
+<br>
 
-# Stage 2 & beyond
+# Thanks!
+#### I really appreciate your time taking a look at my project. Please, feel free to explore my portfolio to check out my other projects!
 
-Note: This section is for stages 2 and beyond.
+```
+    ___           _________     _________
+   /\  \         /\   ______\  /\   ____  \
+   \ \  \        \ \   ___\ /  \ \  \__/\  \
+    \ \  \______  \ \  \_/____  \ \  \___\  \    ___
+     \ \_________\ \ \_________\ \ \_________\  /\__\
+      \/_________/  \/_________/  \/_________/  \/__/
 
-1. Ensure you have `uv` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `app/main.py`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+
+    Developed by: Leonardo Alves Bezerra.
+```
+
+<div>
+<a href="https://www.linkedin.com/in/leonardoabezerra" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
+</a>
+<a href="mailto:leonardoalvesbezerra@gmail.com" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail Badge"/>
+</a>
+<a href="https://leonardoabezerra.github.io/my-portfolio" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/Portfolio-brightgreen?style=for-the-badge&logo=github"/>
+</a>
+</div>
