@@ -47,7 +47,7 @@ This custom comand-line interface (CLI) built with Python replicates core Unix s
 ### Example usage
 ```sh
 $ ls -la | grep ".py" > python_files.txt
-$ cat python files.txt
+$ cat python_files.txt
 $ history 5
 ```
 
