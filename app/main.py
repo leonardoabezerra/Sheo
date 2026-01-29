@@ -1,4 +1,4 @@
-import sys, os, shlex, readline
+import sys, os, shlex, readline, pwd
 
 PATH = os.environ['PATH']
 HISTFILE = os.environ['HISTFILE'] if 'HISTFILE' in os.environ else ""
@@ -9,6 +9,11 @@ SHELL_STATE_ARGS = ['-r', '-w', '-a']
 history = []
 history_append = []
 
+class Colors:
+    CYAN = '\033[96m'
+    BLUE = '\033[94m'
+    ERROR = '\033[91m'
+    RESET = '\033[0m'
 
 def activate_autocompletion():
     path_executables = set()
@@ -52,7 +57,7 @@ def load_histfile():
     except FileNotFoundError:
         pass  # HISTFILE environment variable is not necessary
     except Exception as err:
-        sys.stderr.write(f'Error loading history file: {err}\n')
+        sys.stderr.write(f'{Colors.ERROR}Error loading history file: {err}\n')
 
 
 def update_histfile():
@@ -64,7 +69,7 @@ def update_histfile():
     except FileNotFoundError:
         pass # HISTFILE environment variable is not necessary
     except Exception as err:
-        sys.stderr.write(f'Error updating history file: {err}\n')
+        sys.stderr.write(f'{Colors.ERROR}Error updating history file: {err}\n')
 
 
 def execute_builtin(command, args):
@@ -73,6 +78,7 @@ def execute_builtin(command, args):
         # Execute built-in commands or external programs
         if command == 'exit':
             update_histfile()
+            print(f"{Colors.CYAN}Sheo{Colors.RESET}$ Bye :D")
             sys.exit(0)
         elif command == 'echo':
             print(f"{args_str}")
@@ -130,7 +136,7 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
                     return True
                 except Exception as err:
-                    sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
+                    sys.stderr.write(f'{Colors.ERROR}history: {path_to_hfile}: {err}\n')
                     return True
 
             elif len(args) > 1 and args[0] == '-w':
@@ -145,7 +151,7 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
                     return True
                 except Exception as err:
-                    sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
+                    sys.stderr.write(f'{Colors.ERROR}history: {path_to_hfile}: {err}\n')
                     return True
             
             elif len(args) > 1 and args[0] == '-a':
@@ -161,7 +167,7 @@ def execute_builtin(command, args):
                     sys.stderr.write(f'history: {path_to_hfile}: No such file or directory\n')
                     return True
                 except Exception as err:
-                    sys.stderr.write(f'history: {path_to_hfile}: {err}\n')
+                    sys.stderr.write(f'{Colors.ERROR}history: {path_to_hfile}: {err}\n')
                     return True
 
 
@@ -183,8 +189,18 @@ def main():
     load_histfile()
 
     while True:
+
+        # Prepare input prompt
+        current_user = pwd.getpwuid(os.getuid()).pw_name
+        current_wd = os.getcwd()
+        split_cwd = current_wd.split(os.sep)
+
+        if current_user in split_cwd and len(split_cwd) > 1:
+            user_index = split_cwd.index(current_user)
+            current_wd = '~' + os.sep + os.sep.join(split_cwd[user_index + 1:])
+        
         try:
-            input_line = input("$ ")
+            input_line = input(f"{Colors.CYAN}{current_user}@sheo:{Colors.BLUE}{current_wd}{Colors.RESET}$ ")
         except (EOFError, KeyboardInterrupt):
             break
 
@@ -291,7 +307,7 @@ def main():
                     try:
                         os.execv(found_path, [cmd_name] + cmd_args)
                     except Exception as err:
-                        sys.stderr.write(f"Error executing {cmd_name}: {err}\n")
+                        sys.stderr.write(f"{Colors.ERROR}Error executing {cmd_name}: {err}\n")
                         os._exit(1)
                 else:
                     sys.stderr.write(f"{cmd_name}: command not found\n")
