@@ -203,7 +203,7 @@ def main():
         current_wd = os.getcwd()
         split_cwd = current_wd.split(os.sep)
 
-        if current_user in split_cwd and len(split_cwd) > 1:
+        if ('home' in split_cwd and current_user in split_cwd) and len(split_cwd) > 1:
             user_index = split_cwd.index(current_user)
             current_wd = '~' + os.sep + os.sep.join(split_cwd[user_index + 1:])
         
@@ -344,6 +344,10 @@ def main():
                 os.waitpid(pid, 0)
             except ChildProcessError:
                 pass
+        
+        # Close any remaining fds
+        if input_fd != 0:
+            os.close(input_fd)
 
 if __name__ == "__main__":
     main()
